@@ -32,8 +32,9 @@ public class SecurityConfig {
     @Bean SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter, PasswordChangeRequiredFilter passwordChangeFilter, ObjectMapper mapper) throws Exception {
         return http.csrf(csrf -> csrf.disable()).cors(cors -> {}).sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/login", "/actuator/health").permitAll()
-                        .requestMatchers("/api/v1/auth/change-password").hasRole("STUDENT")
+                        .requestMatchers("/api/v1/auth/change-password").hasAnyRole("STUDENT", "MENTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/mentor/**").hasRole("MENTOR")
                         .requestMatchers("/api/v1/student/**").hasRole("STUDENT")
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint((req, res, ex) -> write(mapper, res, 401, "UNAUTHORIZED", "Authentication is required"))

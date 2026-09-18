@@ -1,6 +1,6 @@
 # Internship Management System
 
-The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, and Phase 2.3 complete internship information. The active roles are III Cell Incharge (`ADMIN`) and Student (`STUDENT`). HOD and Mentor remain represented only in the extensible role model; their workflows are intentionally not implemented.
+The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, and Phase 3.1 mentor account foundation. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Student–mentor assignment, mentor monitoring workflows, and attendance remain outside the current scope.
 
 ## Structure
 
@@ -39,6 +39,7 @@ npm run dev
 Open `http://localhost:3000`. There is one login form and no public registration. Authenticated users are redirected by the role returned by the backend:
 
 - `ADMIN` → `/admin/dashboard`
+- `MENTOR` → `/mentor/dashboard` after the required first-login password change
 - `STUDENT` → `/student/dashboard`
 
 ## Authentication API
@@ -46,7 +47,16 @@ Open `http://localhost:3000`. There is one login form and no public registration
 - `POST /api/v1/auth/login` — validates credentials and returns safe user data while setting the JWT in an HttpOnly cookie
 - `GET /api/v1/auth/me` — returns the authenticated user
 - `POST /api/v1/auth/logout` — expires the authentication cookie
+- `POST /api/v1/auth/change-password` — replaces the temporary password for a Student or Mentor account on first login
 - `GET /api/v1/admin/verification` — minimal ADMIN-only endpoint used to verify 403 behavior
+
+### Mentor account API
+
+- `POST /api/v1/admin/mentor-accounts` — creates a Mentor account using its employee ID as the one-time initial credential
+- `GET /api/v1/admin/mentor-accounts` — lists Mentor accounts for the III Cell
+- `GET /api/v1/mentor/profile` — retrieves only the authenticated Mentor's profile after the required password change
+
+The temporary employee-ID credential is BCrypt-hashed before persistence and is never returned as a password or hash. A new Mentor must replace it through the existing password-change flow before accessing the placeholder Mentor dashboard. Student–mentor assignment and attendance data are intentionally absent.
 
 ### Student profile API
 

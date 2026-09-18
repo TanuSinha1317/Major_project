@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 export default function LoginPage() {
   const router = useRouter(); const { user, loading, refresh } = useAuth();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [submitting, setSubmitting] = useState(false); const [error, setError] = useState("");
-  const destination = (account: AuthUser) => account.role === "ADMIN" ? "/admin/dashboard" : account.mustChangePassword ? "/student/change-password" : "/student/dashboard";
+  const destination = (account: AuthUser) => account.role === "ADMIN" ? "/admin/dashboard" : account.role === "MENTOR" ? account.mustChangePassword ? "/mentor/change-password" : "/mentor/dashboard" : account.mustChangePassword ? "/student/change-password" : "/student/dashboard";
   useEffect(() => { if (!loading && user) router.replace(destination(user)); }, [loading, user, router]);
   async function submit(event: FormEvent) {
     event.preventDefault(); setError(""); setSubmitting(true);

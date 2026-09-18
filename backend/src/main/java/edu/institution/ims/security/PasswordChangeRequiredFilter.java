@@ -25,7 +25,7 @@ public class PasswordChangeRequiredFilter extends OncePerRequestFilter {
     @Override protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserPrincipal principal
-                && "STUDENT".equals(principal.role()) && principal.mustChangePassword()) {
+                && ("STUDENT".equals(principal.role()) || "MENTOR".equals(principal.role())) && principal.mustChangePassword()) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             mapper.writeValue(response.getWriter(), new ApiError(Instant.now(), 403, "PASSWORD_CHANGE_REQUIRED", "Change your temporary password before continuing", null));
