@@ -6,6 +6,7 @@ import edu.institution.ims.studentprofile.ProfileNotFoundException;
 import edu.institution.ims.internship.OnboardingException;
 import edu.institution.ims.internship.InternshipDetailsException;
 import edu.institution.ims.mentor.MentorAccountConflictException;
+import edu.institution.ims.mentor.MentorAssignmentException;
 import org.springframework.http.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InactiveAccountException.class) ResponseEntity<ApiError> inactive(InactiveAccountException e) { return error(HttpStatus.FORBIDDEN, "ACCOUNT_INACTIVE", e.getMessage()); }
     @ExceptionHandler(DuplicateEmailException.class) ResponseEntity<ApiError> duplicate(DuplicateEmailException e) { return error(HttpStatus.CONFLICT, "DUPLICATE_EMAIL", e.getMessage()); }
     @ExceptionHandler(MentorAccountConflictException.class) ResponseEntity<ApiError> mentorConflict(MentorAccountConflictException e) { return error(HttpStatus.CONFLICT, e.getCode(), e.getMessage()); }
+    @ExceptionHandler(MentorAssignmentException.class) ResponseEntity<ApiError> mentorAssignment(MentorAssignmentException e) { return error(e.getStatus(), e.getCode(), e.getMessage()); }
     @ExceptionHandler(DataIntegrityViolationException.class) ResponseEntity<ApiError> duplicateConstraint() { return error(HttpStatus.CONFLICT, "DUPLICATE_EMAIL", "An account with this email already exists"); }
     @ExceptionHandler(ProfileConflictException.class) ResponseEntity<ApiError> profileConflict(ProfileConflictException e) { return error(HttpStatus.CONFLICT, e.getCode(), e.getMessage()); }
     @ExceptionHandler(ProfileNotFoundException.class) ResponseEntity<ApiError> profileNotFound(ProfileNotFoundException e) { return error(HttpStatus.NOT_FOUND, "PROFILE_NOT_FOUND", e.getMessage()); }

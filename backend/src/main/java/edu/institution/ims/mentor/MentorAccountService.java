@@ -11,9 +11,11 @@ import java.util.Locale;
 
 @Service
 public class MentorAccountService {
-    private final UserRepository users; private final MentorProfileRepository mentors; private final PasswordEncoder encoder;
-    public MentorAccountService(UserRepository users, MentorProfileRepository mentors, PasswordEncoder encoder) {
-        this.users = users; this.mentors = mentors; this.encoder = encoder;
+    private final UserRepository users; private final MentorProfileRepository mentors;
+    private final MentorStudentAssignmentRepository assignments; private final PasswordEncoder encoder;
+    public MentorAccountService(UserRepository users, MentorProfileRepository mentors,
+            MentorStudentAssignmentRepository assignments, PasswordEncoder encoder) {
+        this.users = users; this.mentors = mentors; this.assignments = assignments; this.encoder = encoder;
     }
 
     @Transactional
@@ -33,18 +35,19 @@ public class MentorAccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<MentorAccountResponse> list() { return mentors.findAllByOrderByNameAsc().stream().map(MentorAccountService::response).toList(); }
+    public List<MentorAccountResponse> list() { return mentors.findAllByOrderByNameAsc().stream().map(this::response).toList(); }
 
     @Transactional(readOnly = true)
     public MentorAccountResponse own(UserPrincipal principal) {
-        return mentors.findByUserId(principal.id()).map(MentorAccountService::response)
+        return mentors.findByUserId(principal.id()).map(this::response)
                 .orElseThrow(() -> new IllegalArgumentException("Mentor profile was not found"));
     }
 
-    private static MentorAccountResponse response(MentorProfile profile) {
+    MentorAccountResponse response(MentorProfile profile) {
         User user = profile.getUser();
         return new MentorAccountResponse(profile.getId(), user.getId(), profile.getName(), profile.getEmployeeId(), user.getEmail(),
-                profile.getDepartment(), profile.getDesignation(), profile.getPhone(), user.isActive(), user.isMustChangePassword(), profile.getCreatedAt());
+                profile.getDepartment(), profile.getDesignation(), profile.getPhone(), user.isActive(), user.isMustChangePassword(),
+                assignments.countByMentorIdAndActiveTrue(user.getId()), profile.getCreatedAt());
     }
     private static MentorAccountConflictException conflict(String code, String message) { return new MentorAccountConflictException(code, message); }
     private static String clean(String value) { return value.trim(); }

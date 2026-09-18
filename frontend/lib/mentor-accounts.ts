@@ -9,6 +9,7 @@ export type MentorAccount = {
   phone: string;
   active: boolean;
   mustChangePassword: boolean;
+  assignedStudentCount: number;
   createdAt: string;
 };
 

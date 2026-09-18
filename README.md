@@ -1,6 +1,6 @@
 # Internship Management System
 
-The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, and Phase 3.1 mentor account foundation. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Student–mentor assignment, mentor monitoring workflows, and attendance remain outside the current scope.
+The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, Phase 3.1 mentor account foundation, and Phase 3.2 student–mentor assignment. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Attendance, weekly reporting, and the full mentor monitoring workflow remain outside the current scope.
 
 ## Structure
 
@@ -55,8 +55,12 @@ Open `http://localhost:3000`. There is one login form and no public registration
 - `POST /api/v1/admin/mentor-accounts` — creates a Mentor account using its employee ID as the one-time initial credential
 - `GET /api/v1/admin/mentor-accounts` — lists Mentor accounts for the III Cell
 - `GET /api/v1/mentor/profile` — retrieves only the authenticated Mentor's profile after the required password change
+- `GET /api/v1/admin/mentors/{mentorUserId}/students` — returns safe assignment-management data and current totals
+- `POST /api/v1/admin/mentors/{mentorUserId}/students` — assigns or transactionally reassigns one or more Students
+- `DELETE /api/v1/admin/mentors/{mentorUserId}/students/{studentUserId}` — ends an active assignment without deleting its history
+- `GET /api/v1/mentor/students` — returns only the authenticated Mentor's currently assigned Students
 
-The temporary employee-ID credential is BCrypt-hashed before persistence and is never returned as a password or hash. A new Mentor must replace it through the existing password-change flow before accessing the placeholder Mentor dashboard. Student–mentor assignment and attendance data are intentionally absent.
+The temporary employee-ID credential is BCrypt-hashed before persistence and is never returned as a password or hash. A new Mentor must replace it through the existing password-change flow before accessing Mentor routes. Assignments retain history when removed or reassigned, and the mentor-facing student list derives ownership from the authenticated principal. Attendance and later monitoring data are intentionally absent.
 
 ### Student profile API
 
