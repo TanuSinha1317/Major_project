@@ -1,6 +1,6 @@
 # Internship Management System
 
-The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, Phase 3.1 mentor account foundation, and Phase 3.2 student–mentor assignment. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Attendance, weekly reporting, and the full mentor monitoring workflow remain outside the current scope.
+The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, Phase 3.1 mentor account foundation, Phase 3.2 student–mentor assignment, and Phase 3.4 attendance foundation. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Attendance evidence, GPS/camera verification, weekly reporting, and analytics remain outside the current scope.
 
 ## Structure
 
@@ -60,7 +60,16 @@ Open `http://localhost:3000`. There is one login form and no public registration
 - `DELETE /api/v1/admin/mentors/{mentorUserId}/students/{studentUserId}` — ends an active assignment without deleting its history
 - `GET /api/v1/mentor/students` — returns only the authenticated Mentor's currently assigned Students
 
-The temporary employee-ID credential is BCrypt-hashed before persistence and is never returned as a password or hash. A new Mentor must replace it through the existing password-change flow before accessing Mentor routes. Assignments retain history when removed or reassigned, and the mentor-facing student list derives ownership from the authenticated principal. Attendance and later monitoring data are intentionally absent.
+The temporary employee-ID credential is BCrypt-hashed before persistence and is never returned as a password or hash. A new Mentor must replace it through the existing password-change flow before accessing Mentor routes. Assignments retain history when removed or reassigned, and mentor-facing data derives ownership from the authenticated principal. Basic attendance is intentionally unverified until later evidence phases are implemented.
+
+### Attendance API
+
+- `POST /api/v1/student/attendance/today` — records the authenticated Student as `PRESENT` and `UNVERIFIED` using the configured server clock
+- `GET /api/v1/student/attendance/today` — returns only the authenticated Student's state for the server's current date
+- `GET /api/v1/student/attendance` — returns only the authenticated Student's attendance history
+- `GET /api/v1/mentor/attendance/today` — returns today's state only for the authenticated Mentor's currently assigned Students
+
+Attendance requires completed internship details and a server date inside the registered internship period. One record per Student, internship, and date is enforced in both the service and database. Mentor approval, camera, GPS, evidence, and automated verification are not part of this phase.
 
 ### Student profile API
 

@@ -5,18 +5,18 @@ import { AppFrame } from "@/components/AppFrame";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { api } from "@/lib/api";
 import { MentorAccount } from "@/lib/mentor-accounts";
-import { AssignmentStudent } from "@/lib/mentor-assignments";
+import { MentorStudentAttendance } from "@/lib/attendance";
 
 function MentorDashboardContent() {
   const [mentor, setMentor] = useState<MentorAccount | null>(null);
-  const [students, setStudents] = useState<AssignmentStudent[]>([]);
+  const [students, setStudents] = useState<MentorStudentAttendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     Promise.all([
       api.get<MentorAccount>("/mentor/profile"),
-      api.get<AssignmentStudent[]>("/mentor/students")
+      api.get<MentorStudentAttendance[]>("/mentor/attendance/today")
     ]).then(([profile, assigned]) => {
       setMentor(profile.data); setStudents(assigned.data);
     }).catch(() => setError("Unable to load your mentor dashboard."))
@@ -41,8 +41,8 @@ function MentorDashboardContent() {
           </section>
           <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-7">
             <h2 className="text-xl font-bold">Assigned Students</h2>
-            <p className="mt-2 text-sm text-slate-600">Only students currently assigned to you are shown.</p>
-            {students.length === 0 ? <p className="mt-6 text-sm text-slate-500">No students are currently assigned.</p> : <div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b text-xs uppercase tracking-wide text-slate-500"><tr><th className="pb-3">Student</th><th className="pb-3">UID</th><th className="pb-3">Branch</th><th className="pb-3">Semester</th></tr></thead><tbody>{students.map(student => <tr key={student.userId} className="border-b border-slate-100 last:border-0"><td className="py-4 font-semibold">{student.name || "Profile incomplete"}</td><td className="py-4">{student.uid || "—"}</td><td className="py-4">{student.branchLabel || "—"}</td><td className="py-4">{student.semester ?? "—"}</td></tr>)}</tbody></table></div>}
+            <p className="mt-2 text-sm text-slate-600">Attendance appears automatically for students currently assigned to you.</p>
+            {students.length === 0 ? <p className="mt-6 text-sm text-slate-500">No students are currently assigned.</p> : <div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b text-xs uppercase tracking-wide text-slate-500"><tr><th className="pb-3">Student</th><th className="pb-3">Company</th><th className="pb-3">Mode</th><th className="pb-3">Today&apos;s Attendance</th></tr></thead><tbody>{students.map(student => <tr key={student.studentUserId} className="border-b border-slate-100 last:border-0"><td className="py-4"><p className="font-semibold">{student.name || "Profile incomplete"}</p><p className="mt-1 text-xs text-slate-500">{student.uid || "UID unavailable"}</p></td><td className="py-4">{student.companyName || "—"}</td><td className="py-4">{student.internshipModeLabel || "—"}</td><td className="py-4 font-medium">{student.todayAttendance ? student.todayAttendance.verificationStatus === "UNVERIFIED" ? "Present — Unverified" : student.todayAttendance.attendanceResult === "PRESENT" ? "Present — Verified" : "Absent" : "Not Submitted"}</td></tr>)}</tbody></table></div>}
           </section>
         </>
       )}

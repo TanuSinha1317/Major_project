@@ -6,6 +6,7 @@ import { AppFrame } from "@/components/AppFrame";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { StatusBadge } from "@/components/StatusBadge";
 import { WorkflowBadge } from "@/components/WorkflowBadge";
+import { TodayAttendanceCard } from "@/components/TodayAttendanceCard";
 import { api } from "@/lib/api";
 import { InternshipDetails } from "@/lib/internship-details";
 import { InternshipOnboarding } from "@/lib/internship-onboarding";
@@ -27,5 +28,6 @@ export default function StudentDashboard() {
         {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
       </section>
     </div>
+    <TodayAttendanceCard />
   </main></AppFrame></ProtectedRoute>;
 }

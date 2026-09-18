@@ -24,6 +24,8 @@ server:
   error:
     include-stacktrace: never
 app:
+  attendance:
+    zone: ${ATTENDANCE_ZONE:Asia/Kolkata}
   profile-encryption-key: ${PROFILE_ENCRYPTION_KEY}
   file-storage:
     root: ${DOCUMENT_STORAGE_ROOT:./data/internship-documents}
