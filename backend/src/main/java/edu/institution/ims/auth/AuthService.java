@@ -14,7 +14,7 @@ public class AuthService {
     public LoginResult login(LoginRequest request) {
         var user = users.findByEmailIgnoreCase(request.email()).orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
         if (!user.isActive()) throw new InactiveAccountException();
-        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email().trim().toLowerCase(), request.password()));
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         var principal = (UserPrincipal) authentication.getPrincipal();
         return new LoginResult(jwt.create(principal), response(principal));
     }

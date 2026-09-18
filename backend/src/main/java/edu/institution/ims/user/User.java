@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import edu.institution.ims.studentprofile.StudentProfile;
 import edu.institution.ims.internship.InternshipOnboarding;
 import java.time.Instant;
+import java.util.Locale;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"), indexes = {
@@ -24,7 +25,7 @@ public class User {
 
     protected User() {}
     public User(String email, String passwordHash, Role role, boolean active) {
-        this.email = email.trim().toLowerCase(); this.passwordHash = passwordHash; this.role = role; this.active = active;
+        this.email = email.trim().toLowerCase(Locale.ROOT); this.passwordHash = passwordHash; this.role = role; this.active = active;
     }
     @PrePersist void createTimestamps() { var now = Instant.now(); createdAt = now; updatedAt = now; }
     @PreUpdate void updateTimestamp() { updatedAt = Instant.now(); }

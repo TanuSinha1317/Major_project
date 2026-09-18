@@ -44,6 +44,10 @@ class AuthIntegrationTest {
         login("student1@example.edu", "StudentPassword!23").andExpect(status().isOk()).andExpect(jsonPath("$.role").value("STUDENT")).andExpect(jsonPath("$.id").value(student.getId()));
     }
 
+    @Test void loginNormalizesEmailWhitespaceAndCaseWithoutChangingThePassword() throws Exception {
+        login("  STUDENT1@EXAMPLE.EDU  ", "StudentPassword!23").andExpect(status().isOk()).andExpect(jsonPath("$.id").value(student.getId()));
+    }
+
     @Test void incorrectPasswordReturns401() throws Exception { login("student1@example.edu", "WrongPassword!23").andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS")); }
     @Test void inactiveAccountReturns403() throws Exception { login("inactive@example.edu", "InactivePassword!23").andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("ACCOUNT_INACTIVE")); }
     @Test void unauthenticatedMeReturns401() throws Exception { mvc.perform(get("/api/v1/auth/me")).andExpect(status().isUnauthorized()); }
