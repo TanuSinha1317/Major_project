@@ -15,13 +15,15 @@ public class AttendanceService {
     private final AttendanceRepository attendance;
     private final InternshipDetailsRepository internships;
     private final UserRepository users;
+    private final AttendancePolicyService policies;
     private final Clock clock;
 
     public AttendanceService(AttendanceRepository attendance, InternshipDetailsRepository internships,
-            UserRepository users, Clock clock) {
+            UserRepository users, AttendancePolicyService policies, Clock clock) {
         this.attendance = attendance;
         this.internships = internships;
         this.users = users;
+        this.policies = policies;
         this.clock = clock;
     }
 
@@ -32,6 +34,11 @@ public class AttendanceService {
         InternshipDetails internship = eligibleInternship(student.getId());
         LocalDate today = LocalDate.now(clock);
         requireWithinInternship(internship, today);
+        AttendanceVerificationMethod method = policies.resolve(internship, today).verificationMethod();
+        if (method == AttendanceVerificationMethod.PHYSICAL || method == AttendanceVerificationMethod.REMOTE) {
+            throw error(HttpStatus.CONFLICT, "ATTENDANCE_EVIDENCE_REQUIRED",
+                    "Use today's required attendance evidence flow");
+        }
         if (attendance.findByStudentIdAndAttendanceDate(student.getId(), today).isPresent()) {
             throw duplicate();
         }
@@ -88,7 +95,7 @@ public class AttendanceService {
                 "Today's attendance has already been submitted");
     }
 
-    private static AttendanceException error(HttpStatus status, String code, String message) {
+    static AttendanceException error(HttpStatus status, String code, String message) {
         return new AttendanceException(status, code, message);
     }
 }

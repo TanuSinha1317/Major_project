@@ -1,5 +1,7 @@
 package edu.institution.ims.attendance;
 
 public enum AttendanceSubmissionType {
-    BASIC
+    BASIC,
+    PHYSICAL_CAPTURE,
+    REMOTE_CAPTURE
 }

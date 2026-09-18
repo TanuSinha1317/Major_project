@@ -1,6 +1,6 @@
 # Internship Management System
 
-The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, Phase 3.1 mentor account foundation, Phase 3.2 student–mentor assignment, and Phase 3.4 attendance foundation. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Attendance evidence, GPS/camera verification, weekly reporting, and analytics remain outside the current scope.
+The system currently includes the Phase 1 authentication foundation, Phase 2.1 student institutional profiles, Phase 2.2 internship onboarding, Phase 2.3 complete internship information, Phase 3.1 mentor account foundation, Phase 3.2 student–mentor assignment, Phase 3.4 attendance foundation, Phase 3.5 physical attendance verification, and Phase 3.6 online/hybrid attendance verification. The active roles are III Cell Incharge (`ADMIN`), Student (`STUDENT`), and Mentor (`MENTOR`). Edge AI, weekly reporting, and analytics remain outside the current scope.
 
 ## Structure
 
@@ -65,11 +65,20 @@ The temporary employee-ID credential is BCrypt-hashed before persistence and is 
 ### Attendance API
 
 - `POST /api/v1/student/attendance/today` — records the authenticated Student as `PRESENT` and `UNVERIFIED` using the configured server clock
+- `POST /api/v1/student/attendance/today/physical` — accepts a fresh camera capture and optional live coordinates/accuracy; the backend calculates OFFICE_REPORTING geofence verification
+- `POST /api/v1/student/attendance/today/remote` — accepts a fresh camera capture plus a required 20–1000 character daily work summary; no GPS/geofence is required
+- `GET /api/v1/student/attendance/today/policy` — returns the server-selected verification policy and expected work mode for today
 - `GET /api/v1/student/attendance/today` — returns only the authenticated Student's state for the server's current date
 - `GET /api/v1/student/attendance` — returns only the authenticated Student's attendance history
 - `GET /api/v1/mentor/attendance/today` — returns today's state only for the authenticated Mentor's currently assigned Students
+- `GET /api/v1/student/internship/hybrid-schedule` — lets a hybrid Student view the institution-controlled weekly schedule
+- `GET /api/v1/mentor/students/{studentId}/hybrid-schedule` — lets a Mentor view the schedule of an assigned hybrid Student
+- `GET/PUT /api/v1/admin/students/{studentId}/internship/hybrid-schedule` — lets the III Cell view or configure the normalized weekly Office/Remote schedule
+- `GET/PUT /api/v1/student/internship/location` — lets a Student view or propose their own internship coordinates; proposals remain `PENDING`
+- `GET/PUT /api/v1/admin/students/{studentId}/internship/location` — lets the III Cell review or update expected coordinates and radius
+- `POST /api/v1/admin/students/{studentId}/internship/location/confirm` — confirms the trusted location; only ADMIN can call it
 
-Attendance requires completed internship details and a server date inside the registered internship period. One record per Student, internship, and date is enforced in both the service and database. Mentor approval, camera, GPS, evidence, and automated verification are not part of this phase.
+Attendance requires completed internship details and a server date inside the registered internship period. One record per Student, internship, and date is enforced in both the service and database. OFFICE_REPORTING and hybrid Office days use the physical camera/GPS/geofence policy. ONLINE and hybrid Remote days use a fresh camera capture plus a 20–1000 character daily work summary without requesting GPS. The backend selects hybrid policy from the III Cell schedule using the server's day of week; students cannot override it. Raw camera images are processed transiently and are not stored. Missing or insufficient evidence never becomes automatically verified, and no Mentor approval is involved. Geofence radius, GPS accuracy, image size, and metadata tolerances are configurable through the `ATTENDANCE_*` environment properties documented by their defaults in `application.yml`.
 
 ### Student profile API
 

@@ -71,7 +71,7 @@ class AttendanceIntegrationTest {
         noInternshipStudent = student("student.none@example.edu", "StudentPassword!26", "Student None", "UID400");
         futureInternshipStudent = student("student.future@example.edu", "StudentPassword!27", "Student Future", "UID500");
         incompleteInternshipStudent = student("student.incomplete@example.edu", "StudentPassword!28", "Student Incomplete", "UID600");
-        internshipA = internship(studentA, TODAY.minusDays(10), TODAY.plusDays(10), true, "Alpha Ltd", InternshipMode.OFFICE_REPORTING);
+        internshipA = internship(studentA, TODAY.minusDays(10), TODAY.plusDays(10), true, "Alpha Ltd", InternshipMode.COLLEGE_REPORTING);
         internship(studentB, TODAY.minusDays(10), TODAY.plusDays(10), true, "Beta Ltd", InternshipMode.ONLINE);
         internshipC = internship(studentC, TODAY.minusDays(5), TODAY.plusDays(5), true, "Gamma Ltd", InternshipMode.HYBRID);
         internship(futureInternshipStudent, TODAY.plusDays(1), TODAY.plusDays(20), true, "Future Ltd", InternshipMode.COLLEGE_REPORTING);

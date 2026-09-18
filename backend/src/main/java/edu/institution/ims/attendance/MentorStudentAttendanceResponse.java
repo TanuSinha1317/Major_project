@@ -9,5 +9,6 @@ public record MentorStudentAttendanceResponse(
         String companyName,
         String internshipMode,
         String internshipModeLabel,
+        HybridWorkMode todayWorkMode,
         AttendanceResponse todayAttendance
 ) {}

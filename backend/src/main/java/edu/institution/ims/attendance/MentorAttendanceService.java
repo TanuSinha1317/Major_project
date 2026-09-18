@@ -18,13 +18,16 @@ public class MentorAttendanceService {
     private final MentorStudentAssignmentRepository assignments;
     private final InternshipDetailsRepository internships;
     private final AttendanceRepository attendance;
+    private final AttendancePolicyService policies;
     private final Clock clock;
 
     public MentorAttendanceService(MentorStudentAssignmentRepository assignments,
-            InternshipDetailsRepository internships, AttendanceRepository attendance, Clock clock) {
+            InternshipDetailsRepository internships, AttendanceRepository attendance,
+            AttendancePolicyService policies, Clock clock) {
         this.assignments = assignments;
         this.internships = internships;
         this.attendance = attendance;
+        this.policies = policies;
         this.clock = clock;
     }
 
@@ -40,13 +43,14 @@ public class MentorAttendanceService {
                 .findAllByStudentIdInAndAttendanceDate(studentIds, LocalDate.now(clock))
                 .stream().collect(Collectors.toMap(a -> a.getStudent().getId(), Function.identity()));
 
+        LocalDate today = LocalDate.now(clock);
         return current.stream().map(assignment -> response(assignment.getStudent(),
                 internshipByStudent.get(assignment.getStudent().getId()),
-                attendanceByStudent.get(assignment.getStudent().getId()))).toList();
+                attendanceByStudent.get(assignment.getStudent().getId()), today)).toList();
     }
 
-    private static MentorStudentAttendanceResponse response(User student, InternshipDetails internship,
-            AttendanceRecord attendance) {
+    private MentorStudentAttendanceResponse response(User student, InternshipDetails internship,
+            AttendanceRecord attendance, LocalDate today) {
         StudentProfile profile = student.getStudentProfile();
         StudentAccount account = student.getStudentAccount();
         return new MentorStudentAttendanceResponse(student.getId(),
@@ -57,6 +61,7 @@ public class MentorAttendanceService {
                 internship == null ? null : internship.getCompanyName(),
                 internship == null ? null : internship.getInternshipMode().name(),
                 internship == null ? null : internship.getInternshipMode().getLabel(),
+                internship == null ? null : policies.resolve(internship, today).todayWorkMode(),
                 attendance == null ? null : AttendanceService.response(attendance));
     }
 }
